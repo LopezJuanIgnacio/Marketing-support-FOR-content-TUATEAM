@@ -34,8 +34,8 @@ export function UploadBox({ className, onFileSelect, ...props }: UploadBoxProps)
   return (
     <div
       className={cn(
-        "flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors bg-slate-50",
-        isDragging ? "border-blue-500 bg-blue-50" : "border-slate-300 hover:bg-slate-100",
+        "flex flex-col items-center justify-center w-full h-64 border-2 border-dashed rounded-lg cursor-pointer transition-colors bg-brand-grey/5",
+        isDragging ? "border-brand-red bg-brand-red/5" : "border-brand-grey/20 hover:bg-brand-grey/10",
         className
       )}
       onDragOver={handleDragOver}
@@ -44,11 +44,11 @@ export function UploadBox({ className, onFileSelect, ...props }: UploadBoxProps)
       {...props}
     >
       <div className="flex flex-col items-center justify-center pt-5 pb-6">
-        <UploadCloud className="w-10 h-10 mb-3 text-slate-400" />
-        <p className="mb-2 text-sm text-slate-500">
-          <span className="font-semibold">Click to upload</span> or drag and drop
+        <UploadCloud className="w-10 h-10 mb-3 text-brand-grey" />
+        <p className="mb-2 text-sm text-brand-grey">
+          <span className="font-semibold text-white">Click to upload</span> or drag and drop
         </p>
-        <p className="text-xs text-slate-500">PDF documents only (MAX. 10MB)</p>
+        <p className="text-xs text-brand-grey">PDF documents only (MAX. 10MB)</p>
       </div>
       <input type="file" className="hidden" accept=".pdf" onChange={(e) => {
         if (e.target.files && e.target.files.length > 0 && onFileSelect) {

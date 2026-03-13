@@ -32,10 +32,10 @@ export function Sidebar() {
   const pathname = usePathname();
 
   return (
-    <nav className="hidden border-r bg-slate-50 md:block w-64 h-full min-h-[calc(100vh-4rem)]">
+    <nav className="hidden border-r border-brand-grey/20 bg-background md:block w-64 h-full min-h-[calc(100vh-4rem)]">
       <div className="space-y-4 py-4">
         <div className="px-3 py-2">
-          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight">
+          <h2 className="mb-2 px-4 text-lg font-semibold tracking-tight text-white">
             Menu
           </h2>
           <div className="space-y-1">
@@ -44,8 +44,8 @@ export function Sidebar() {
                 key={item.href}
                 href={item.href}
                 className={cn(
-                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium hover:bg-slate-100 hover:text-slate-900",
-                  pathname === item.href ? "bg-slate-200 text-slate-900" : "text-slate-500"
+                  "flex items-center gap-3 rounded-md px-3 py-2 text-sm font-medium transition-colors hover:bg-brand-grey/20 hover:text-white",
+                  pathname === item.href ? "bg-brand-red/20 text-brand-red" : "text-brand-grey"
                 )}
               >
                 <item.icon className="h-4 w-4" />

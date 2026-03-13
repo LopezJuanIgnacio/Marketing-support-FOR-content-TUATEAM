@@ -22,8 +22,8 @@ export default function UploadPage() {
   return (
     <div className="space-y-6 max-w-2xl mx-auto">
       <div className="flex flex-col space-y-2">
-        <h1 className="text-3xl font-bold tracking-tight">Upload PDF</h1>
-        <p className="text-slate-500 flex items-center">
+        <h1 className="text-3xl font-bold tracking-tight text-white">Upload PDF</h1>
+        <p className="text-brand-grey flex items-center">
           Upload a document to generate your AI video project.
         </p>
       </div>
@@ -36,12 +36,12 @@ export default function UploadPage() {
           {!file ? (
             <UploadBox onFileSelect={(f) => setFile(f)} />
           ) : (
-            <div className="p-4 border rounded-lg flex items-center justify-between bg-slate-50">
+            <div className="p-4 border border-brand-grey/20 rounded-lg flex items-center justify-between bg-brand-grey/5">
               <div className="flex items-center space-x-3">
-                <FileText className="h-8 w-8 text-blue-500" />
+                <FileText className="h-8 w-8 text-brand-red" />
                 <div>
-                  <p className="font-medium text-sm">{file.name}</p>
-                  <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                  <p className="font-medium text-sm text-white">{file.name}</p>
+                  <p className="text-xs text-brand-grey">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
                 </div>
               </div>
               <Button variant="ghost" size="sm" onClick={() => setFile(null)}>
