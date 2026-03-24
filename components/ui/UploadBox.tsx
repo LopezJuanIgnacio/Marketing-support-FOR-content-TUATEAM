@@ -10,6 +10,7 @@ export interface UploadBoxProps extends React.HTMLAttributes<HTMLDivElement> {
 
 export function UploadBox({ className, onFileSelect, ...props }: UploadBoxProps) {
   const [isDragging, setIsDragging] = React.useState(false);
+  const inputRef = React.useRef<HTMLInputElement>(null);
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -31,6 +32,10 @@ export function UploadBox({ className, onFileSelect, ...props }: UploadBoxProps)
     }
   };
 
+  const handleClick = () => {
+    inputRef.current?.click();
+  };
+
   return (
     <div
       className={cn(
@@ -41,6 +46,7 @@ export function UploadBox({ className, onFileSelect, ...props }: UploadBoxProps)
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
       onDrop={handleDrop}
+      onClick={handleClick}
       {...props}
     >
       <div className="flex flex-col items-center justify-center pt-5 pb-6">
@@ -50,7 +56,7 @@ export function UploadBox({ className, onFileSelect, ...props }: UploadBoxProps)
         </p>
         <p className="text-xs text-brand-grey">PDF documents only (MAX. 10MB)</p>
       </div>
-      <input type="file" className="hidden" accept=".pdf" onChange={(e) => {
+      <input type="file" ref={inputRef} className="hidden" accept=".pdf" onChange={(e) => {
         if (e.target.files && e.target.files.length > 0 && onFileSelect) {
           onFileSelect(e.target.files[0]);
         }
