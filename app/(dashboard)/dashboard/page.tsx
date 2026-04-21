@@ -11,11 +11,32 @@ export default async function DashboardPage() {
   const session = await getServerSession(authOptions);
   
   let projects: any[] = [];
+  let totalDocuments = 0;
+  let totalVideos = 0;
+
   if (session?.user?.id) {
     projects = await prisma.project.findMany({
       where: { userId: session.user.id },
+      include: {
+        _count: {
+          select: { documents: true }
+        }
+      },
       orderBy: { createdAt: "desc" },
     });
+
+    const counts = await prisma.document.count({
+      where: { project: { userId: session.user.id } }
+    });
+    totalDocuments = counts;
+
+    const videoCounts = await prisma.project.count({
+      where: { 
+        userId: session.user.id,
+        status: "completed" // Assuming "completed" means video is rendered
+      }
+    });
+    totalVideos = videoCounts;
   }
 
   return (
@@ -42,8 +63,8 @@ export default async function DashboardPage() {
             <FileText className="h-4 w-4 text-slate-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">0</div>
-            <p className="text-xs text-brand-grey">Upload a PDF to start</p>
+            <div className="text-2xl font-bold text-white">{totalDocuments}</div>
+            <p className="text-xs text-brand-grey">{totalDocuments === 0 ? "Upload a PDF to start" : "PDFs ready for processing"}</p>
           </CardContent>
         </Card>
         <Card>
@@ -52,8 +73,8 @@ export default async function DashboardPage() {
             <Video className="h-4 w-4 text-slate-500" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold text-white">0</div>
-            <p className="text-xs text-brand-grey">0 hours watched</p>
+            <div className="text-2xl font-bold text-white">{totalVideos}</div>
+            <p className="text-xs text-brand-grey">Videos generated</p>
           </CardContent>
         </Card>
       </div>

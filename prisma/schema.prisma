@@ -30,6 +30,7 @@ model Document {
   projectId     String
   project       Project  @relation(fields: [projectId], references: [id], onDelete: Cascade)
   fileUrl       String
+  name          String   @default("Document")
   extractedText String
   createdAt     DateTime @default(now())
 }

@@ -4,9 +4,10 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { Button } from "@/components/ui/Button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/Card";
-import { UploadCloud, FileText, Video, PlayCircle } from "lucide-react";
+import { UploadCloud, FileText, Video, PlayCircle, ExternalLink } from "lucide-react";
 import Link from "next/link";
 import DeleteProjectButton from "@/components/DeleteProjectButton";
+import DeleteDocumentButton from "@/components/DeleteDocumentButton";
 
 export default async function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -71,13 +72,23 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
               <ul className="space-y-2">
                 {project.documents.map(doc => (
                   <li key={doc.id} className="flex items-center justify-between p-3 rounded-md bg-brand-grey/5 border border-brand-grey/10">
-                    <span className="text-sm text-white flex items-center">
-                      <FileText className="mr-2 h-4 w-4 text-brand-grey" />
-                      Document
-                    </span>
-                    <span className="text-xs text-brand-grey">
-                      {new Date(doc.createdAt).toLocaleDateString()}
-                    </span>
+                    <div className="flex items-center flex-1 min-w-0 mr-4">
+                      <FileText className="mr-2 h-4 w-4 text-brand-grey shrink-0" />
+                      <span className="text-sm text-white truncate">
+                        {doc.name || "Document"}
+                      </span>
+                    </div>
+                    <div className="flex items-center space-x-4">
+                      <span className="text-xs text-brand-grey whitespace-nowrap">
+                        {new Date(doc.createdAt).toLocaleDateString()}
+                      </span>
+                      <Button variant="ghost" size="sm" className="h-8 w-8 p-0" asChild title="Open document">
+                        <a href={`/api/documents/${doc.id}/view`} target="_blank" rel="noopener noreferrer">
+                          <ExternalLink className="h-4 w-4 text-brand-red" />
+                        </a>
+                      </Button>
+                      <DeleteDocumentButton documentId={doc.id} />
+                    </div>
                   </li>
                 ))}
               </ul>
