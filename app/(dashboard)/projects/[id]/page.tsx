@@ -108,9 +108,11 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
               <div className="py-8 text-center">
                 <p className="text-brand-grey mb-4 text-sm">Upload a PDF to begin the generation process.</p>
               </div>
-            ) : project.status === "draft" && project.documents.length > 0 ? (
+            ) : (project.status === "analyzed" || project.status === "draft") && project.documents.length > 0 ? (
               <div className="py-8 text-center flex flex-col items-center">
-                <p className="text-brand-grey mb-6 text-sm">PDF analyzed. Ready to generate video.</p>
+                <p className="text-brand-grey mb-6 text-sm">
+                  {project.status === "analyzed" ? "PDF analyzed and text extracted. Ready to generate video." : "PDF uploaded. Ready for analysis."}
+                </p>
                 <Button className="bg-brand-red hover:bg-brand-red/90 text-white w-full">
                   <PlayCircle className="mr-2 h-4 w-4" />
                   Start Generation flow
@@ -142,6 +144,32 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
           </CardContent>
         </Card>
       </div>
+
+      {project.documents.some(doc => doc.extractedText) && (
+        <Card className="border-brand-grey/20 bg-[#0a0a0a]">
+          <CardHeader>
+            <CardTitle className="text-xl text-white flex items-center">
+              <FileText className="mr-2 h-5 w-5 text-brand-red" />
+              Document Analysis
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <div className="space-y-4">
+              {project.documents.filter(doc => doc.extractedText).map(doc => (
+                <div key={doc.id} className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10">
+                  <h4 className="text-sm font-medium text-white mb-2 flex items-center">
+                    <FileText className="mr-2 h-3 w-3 text-brand-grey" />
+                    {doc.name}
+                  </h4>
+                  <div className="text-xs text-brand-grey line-clamp-6 bg-black/40 p-3 rounded border border-brand-grey/10 overflow-auto max-h-48 whitespace-pre-wrap">
+                    {doc.extractedText}
+                  </div>
+                </div>
+              ))}
+            </div>
+          </CardContent>
+        </Card>
+      )}
     </div>
   );
 }

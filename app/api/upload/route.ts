@@ -56,20 +56,34 @@ export async function POST(req: Request) {
 
     const fileUrl = `https://${bucketName}.s3.${process.env.AWS_REGION || "us-east-1"}.amazonaws.com/${objectKey}`;
 
+    // Extract text automatically
+    let extractedText = "";
+    try {
+      const pdf = (await import("pdf-parse/lib/pdf-parse.js")).default;
+      const data = await pdf(buffer);
+      extractedText = data.text
+        .replace(/\r\n/g, "\n")
+        .replace(/\n\s+\n/g, "\n\n")
+        .replace(/[^\x20-\x7E\n\r\t]/g, "")
+        .trim();
+    } catch (e) {
+      console.error("Extraction error during upload:", e);
+    }
+
     // Create Document record
     const document = await prisma.document.create({
       data: {
         projectId,
         fileUrl,
         name: file.name,
-        extractedText: "", // Empty for now, will be filled during analysis
+        extractedText: extractedText || "No text extracted",
       },
     });
 
-    // Update Project status to processing
+    // Update Project status to analyzed
     await prisma.project.update({
       where: { id: projectId },
-      data: { status: "processing" },
+      data: { status: "analyzed" },
     });
 
     return NextResponse.json({ success: true, document });
