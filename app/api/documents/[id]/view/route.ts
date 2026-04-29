@@ -39,10 +39,29 @@ export async function GET(
     }
 
     // Extract bucket and key from fileUrl
-    // URL format: https://bucket.s3.region.amazonaws.com/uploads/user/project/file.pdf
+    console.log("Generating signed URL for:", document.fileUrl);
     const url = new URL(document.fileUrl);
-    const bucketName = url.hostname.split(".")[0];
-    const objectKey = url.pathname.substring(1); // Remove leading slash
+    
+    // Support both bucket.s3... and s3.../bucket/ formats
+    let bucketName = "";
+    let objectKey = "";
+
+    if (url.hostname.includes(".s3.")) {
+      // Format: bucket.s3.region.amazonaws.com/key
+      bucketName = url.hostname.split(".")[0];
+      objectKey = decodeURIComponent(url.pathname.substring(1));
+    } else {
+      // Fallback or other formats (e.g. s3.amazonaws.com/bucket/key)
+      const parts = url.pathname.substring(1).split("/");
+      bucketName = parts[0];
+      objectKey = decodeURIComponent(parts.slice(1).join("/"));
+    }
+
+    console.log("S3 Access - Bucket:", bucketName, "Key:", objectKey);
+
+    if (!bucketName || !objectKey) {
+      throw new Error(`Could not extract S3 bucket or key from URL: ${document.fileUrl}`);
+    }
 
     // Generate signed URL
     const command = new GetObjectCommand({
