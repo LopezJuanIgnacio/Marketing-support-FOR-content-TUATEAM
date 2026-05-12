@@ -8,6 +8,7 @@ import { UploadCloud, FileText, Video, PlayCircle, ExternalLink } from "lucide-r
 import Link from "next/link";
 import DeleteProjectButton from "@/components/DeleteProjectButton";
 import DeleteDocumentButton from "@/components/DeleteDocumentButton";
+import GenerateSummaryButton from "@/components/GenerateSummaryButton";
 
 export default async function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -28,6 +29,15 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
 
   if (!project || project.userId !== session.user.id) {
     notFound();
+  }
+
+  let summaryData: any = null;
+  if (project.videoProject?.summary) {
+    try {
+      summaryData = JSON.parse(project.videoProject.summary);
+    } catch (e) {
+      summaryData = { summary: project.videoProject.summary };
+    }
   }
 
   return (
@@ -113,10 +123,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
                 <p className="text-brand-grey mb-6 text-sm">
                   {project.status === "analyzed" ? "PDF analyzed and text extracted. Ready to generate video." : "PDF uploaded. Ready for analysis."}
                 </p>
-                <Button className="bg-brand-red hover:bg-brand-red/90 text-white w-full">
-                  <PlayCircle className="mr-2 h-4 w-4" />
-                  Start Generation flow
-                </Button>
+                <GenerateSummaryButton projectId={project.id} />
               </div>
             ) : project.status === "processing" ? (
               <div className="py-8 text-center flex flex-col items-center">
@@ -126,8 +133,49 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
             ) : project.videoProject ? (
               <div className="space-y-4">
                 <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10">
-                  <h4 className="font-medium text-white mb-2">Summary</h4>
-                  <p className="text-sm text-brand-grey line-clamp-2">{project.videoProject.summary}</p>
+                  <h4 className="font-medium text-white mb-4">Resumen AI</h4>
+                  <div className="space-y-4">
+                    {summaryData?.title && (
+                      <div>
+                        <h5 className="text-xs font-semibold text-brand-grey uppercase">Title</h5>
+                        <p className="text-sm text-white">{summaryData.title}</p>
+                      </div>
+                    )}
+                    {summaryData?.summary && (
+                      <div>
+                        <h5 className="text-xs font-semibold text-brand-grey uppercase">Summary</h5>
+                        <p className="text-sm text-white">{summaryData.summary}</p>
+                      </div>
+                    )}
+                    {summaryData?.keyPoints && summaryData.keyPoints.length > 0 && (
+                      <div>
+                        <h5 className="text-xs font-semibold text-brand-grey uppercase">Key Points</h5>
+                        <ul className="list-disc list-inside text-sm text-white mt-1">
+                          {summaryData.keyPoints.map((point: string, i: number) => <li key={i}>{point}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                    {summaryData?.detectedTopics && summaryData.detectedTopics.length > 0 && (
+                      <div>
+                        <h5 className="text-xs font-semibold text-brand-grey uppercase">Detected Topics</h5>
+                        <div className="flex flex-wrap gap-2 mt-1">
+                          {summaryData.detectedTopics.map((topic: string, i: number) => (
+                            <span key={i} className="px-2 py-1 bg-brand-red/20 text-brand-red text-xs rounded-full border border-brand-red/30">
+                              {topic}
+                            </span>
+                          ))}
+                        </div>
+                      </div>
+                    )}
+                    {summaryData?.videoAngles && summaryData.videoAngles.length > 0 && (
+                      <div>
+                        <h5 className="text-xs font-semibold text-brand-grey uppercase">Video Angles</h5>
+                        <ul className="list-disc list-inside text-sm text-white mt-1">
+                          {summaryData.videoAngles.map((angle: string, i: number) => <li key={i}>{angle}</li>)}
+                        </ul>
+                      </div>
+                    )}
+                  </div>
                 </div>
                 <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10 flex items-center justify-between">
                   <span className="text-sm text-white font-medium">Final Video</span>

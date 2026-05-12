@@ -39,7 +39,7 @@ async function callAI(systemPrompt: string, userPrompt: string): Promise<AIRespo
 export async function generateSummary(documentText: string, userPreferences: string = ""): Promise<AIResponse> {
   const systemPrompt = `You are a professional content analyst. 
   Summarize the core message and key points of the provided text. 
-  The output must be a JSON object with 'title', 'summary' (short), and 'keyPoints' (array of strings).
+  The output must be a JSON object with 'title', 'summary' (short), 'keyPoints' (array of strings), 'detectedTopics' (array of strings), and 'videoAngles' (array of strings).
   Base your analysis strictly on the provided content.
   User Preferences: ${userPreferences}`;
 
