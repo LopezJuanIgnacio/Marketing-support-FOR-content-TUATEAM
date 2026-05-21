@@ -9,6 +9,11 @@ import Link from "next/link";
 import DeleteProjectButton from "@/components/DeleteProjectButton";
 import DeleteDocumentButton from "@/components/DeleteDocumentButton";
 import GenerateSummaryButton from "@/components/GenerateSummaryButton";
+import GenerateStoriesSection from "@/components/GenerateStoriesSection";
+import GenerateScriptSection from "@/components/GenerateScriptSection";
+import GenerateStoryboardSection from "@/components/GenerateStoryboardSection";
+import GenerateAudioSection from "@/components/GenerateAudioSection";
+import GenerateVideoSection from "@/components/GenerateVideoSection";
 
 export default async function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -37,6 +42,34 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
       summaryData = JSON.parse(project.videoProject.summary);
     } catch (e) {
       summaryData = { summary: project.videoProject.summary };
+    }
+  }
+
+  let storyData: any = null;
+  if (project.videoProject?.story) {
+    try {
+      storyData = JSON.parse(project.videoProject.story);
+    } catch (e) {
+      // ignore or fallback
+      storyData = null;
+    }
+  }
+
+  let scriptData: any = null;
+  if (project.videoProject?.script) {
+    try {
+      scriptData = JSON.parse(project.videoProject.script);
+    } catch (e) {
+      scriptData = null;
+    }
+  }
+
+  let storyboardData: any = null;
+  if (project.videoProject?.storyboard) {
+    try {
+      storyboardData = JSON.parse(project.videoProject.storyboard);
+    } catch (e) {
+      storyboardData = null;
     }
   }
 
@@ -118,7 +151,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
               <div className="py-8 text-center">
                 <p className="text-brand-grey mb-4 text-sm">Upload a PDF to begin the generation process.</p>
               </div>
-            ) : (project.status === "analyzed" || project.status === "draft") && project.documents.length > 0 ? (
+            ) : (project.status === "analyzed" || project.status === "draft") && project.documents.length > 0 && !project.videoProject ? (
               <div className="py-8 text-center flex flex-col items-center">
                 <p className="text-brand-grey mb-6 text-sm">
                   {project.status === "analyzed" ? "PDF analyzed and text extracted. Ready to generate video." : "PDF uploaded. Ready for analysis."}
@@ -177,12 +210,56 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
                     )}
                   </div>
                 </div>
-                <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10 flex items-center justify-between">
-                  <span className="text-sm text-white font-medium">Final Video</span>
-                  <Button variant="outline" size="sm" asChild>
-                    <a href={project.videoProject.videoUrl || "#"} target="_blank" rel="noopener noreferrer">Watch</a>
-                  </Button>
-                </div>
+
+                {!storyData ? (
+                  <GenerateStoriesSection projectId={project.id} hasStory={!!storyData} />
+                ) : (
+                  <>
+                    <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10">
+                      <h4 className="font-medium text-white mb-4">Historia Seleccionada</h4>
+                      <div className="space-y-4">
+                        <div>
+                          <h5 className="text-xs font-semibold text-brand-grey uppercase">Title</h5>
+                          <p className="text-sm text-white">{storyData.title}</p>
+                        </div>
+                        <div>
+                          <h5 className="text-xs font-semibold text-brand-grey uppercase">Narrative Angle</h5>
+                          <p className="text-sm text-white">{storyData.narrativeAngle}</p>
+                        </div>
+                        <div className="flex flex-wrap gap-3">
+                          <div>
+                            <h5 className="text-xs font-semibold text-brand-grey uppercase mb-1">Target Audience</h5>
+                            <span className="px-2 py-1 bg-black/40 text-brand-grey text-xs rounded-full border border-brand-grey/20">
+                              {storyData.targetAudience}
+                            </span>
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-semibold text-brand-grey uppercase mb-1">Recommended Tone</h5>
+                            <span className="px-2 py-1 bg-black/40 text-brand-grey text-xs rounded-full border border-brand-grey/20">
+                              {storyData.recommendedTone}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+
+                    <GenerateScriptSection projectId={project.id} initialScriptData={scriptData} />
+                    
+                    {scriptData && (
+                      <GenerateStoryboardSection projectId={project.id} initialStoryboardData={storyboardData} />
+                    )}
+
+                    {storyboardData && (
+                      <>
+                        <GenerateAudioSection projectId={project.id} initialAudioUrl={project.videoProject.audioUrl} />
+                        
+                        {project.videoProject.audioUrl && (
+                          <GenerateVideoSection projectId={project.id} initialVideoUrl={project.videoProject.videoUrl} />
+                        )}
+                      </>
+                    )}
+                  </>
+                )}
               </div>
             ) : (
               <div className="py-8 text-center">

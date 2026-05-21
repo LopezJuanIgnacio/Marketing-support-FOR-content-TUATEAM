@@ -51,8 +51,8 @@ export async function generateSummary(documentText: string, userPreferences: str
  */
 export async function generateStories(documentText: string, userPreferences: string = ""): Promise<AIResponse> {
   const systemPrompt = `You are a creative storyteller. 
-  Generate 3 unique story angles or narrative approaches for a short video based on the document text. 
-  The output must be a JSON object with a 'stories' array. Each story should have 'angleName', 'narrative', and 'targetAudience'.
+  Generate 3 to 5 unique story angles or narrative approaches for a short video based on the document text. 
+  The output must be a JSON object with a 'stories' array. Each story should have 'title', 'narrativeAngle', 'targetAudience', and 'recommendedTone'.
   Base your stories strictly on the provided content.
   User Preferences: ${userPreferences}`;
 
@@ -62,13 +62,14 @@ export async function generateStories(documentText: string, userPreferences: str
 /**
  * Generates a full video script
  */
-export async function generateScript(documentText: string, userPreferences: string = ""): Promise<AIResponse> {
+export async function generateScript(documentText: string, storyContext: string = ""): Promise<AIResponse> {
   const systemPrompt = `You are a professional scriptwriter. 
-  Create a video script based on the provided content. 
-  The output must be a JSON object with 'title', 'totalEstimatedDuration', and 'scenes' (array). 
-  Each scene should have 'sceneNumber', 'dialogue' or 'narration', and 'duration'.
+  Create a video script based on the provided content and the selected narrative story approach. 
+  The output must be a JSON object with 'videoTitle', 'hook', and 'scenes' (array). 
+  Each scene MUST be a fully populated object with 'sceneNumber', 'narration' (the spoken text), 'textOnScreen', and 'cta'.
+  IMPORTANT: Do not include empty scenes, blank objects, or null values in the 'scenes' array. Every item must have actual content.
   Base your script strictly on the provided content.
-  User Preferences: ${userPreferences}`;
+  Selected Story Context: ${storyContext}`;
 
   return callAI(systemPrompt, documentText);
 }
@@ -76,13 +77,13 @@ export async function generateScript(documentText: string, userPreferences: stri
 /**
  * Generates a storyboard with visual descriptions
  */
-export async function generateStoryboard(documentText: string, userPreferences: string = ""): Promise<AIResponse> {
+export async function generateStoryboard(scriptContext: string): Promise<AIResponse> {
   const systemPrompt = `You are a visual director. 
-  Create a storyboard for a video based on the provided content. 
+  Create a storyboard for a video based on the provided script. 
   The output must be a JSON object with 'scenes' (array). 
-  Each scene should have 'sceneNumber', 'visualDescription' (detailed for AI image generation), and 'mood'.
-  Base your storyboard strictly on the provided content.
-  User Preferences: ${userPreferences}`;
+  Each scene MUST be a fully populated object with 'sceneNumber', 'duration' (estimated time in seconds as string, e.g., '5s'), 'narration' (from the script), 'visualSuggestion' (detailed for AI image generation), 'cameraType' (e.g. wide shot, close up), and 'transition'.
+  IMPORTANT: Do not include empty scenes, blank objects, or null values in the 'scenes' array. Every item must have actual content.
+  Base your storyboard strictly on the provided script.`;
 
-  return callAI(systemPrompt, documentText);
+  return callAI(systemPrompt, scriptContext);
 }
