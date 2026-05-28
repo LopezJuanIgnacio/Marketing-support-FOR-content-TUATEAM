@@ -44,7 +44,7 @@ export default function GenerateSummaryButton({ projectId }: { projectId: string
       ) : (
         <>
           <PlayCircle className="mr-2 h-4 w-4" />
-          RESUMEN
+          Summary
         </>
       )}
     </Button>

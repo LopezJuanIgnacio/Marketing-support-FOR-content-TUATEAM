@@ -74,7 +74,6 @@ export default function GenerateStoryboardSection({
     const updatedScenes = [...(storyboardData?.scenes || [])];
     updatedScenes.push({ 
       sceneNumber: updatedScenes.length + 1, 
-      duration: "", 
       narration: "", 
       visualSuggestion: "",
       cameraType: "",
@@ -90,10 +89,10 @@ export default function GenerateStoryboardSection({
     setStoryboardData({ ...storyboardData, scenes: updatedScenes });
   };
 
-  if (!storyboardData) {
+    if (!storyboardData) {
     return (
       <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10 flex flex-col items-center justify-center space-y-4 mt-4">
-        <p className="text-sm text-brand-grey text-center">Convierte el guion en un storyboard detallado para la generación visual.</p>
+        <p className="text-sm text-brand-grey text-center">Convert the script into a detailed storyboard for visual generation.</p>
         <Button 
           onClick={handleGenerate} 
           disabled={isLoading}
@@ -102,7 +101,7 @@ export default function GenerateStoryboardSection({
           {isLoading ? (
             <>
               <div className="w-4 h-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin" />
-              Generando...
+              Generating...
             </>
           ) : (
             <>
@@ -121,13 +120,13 @@ export default function GenerateStoryboardSection({
         <h4 className="font-medium text-white">Storyboard</h4>
         <div className="space-x-2 flex">
           <Button onClick={handleGenerate} disabled={isLoading} variant="outline" size="sm" className="border-brand-grey/20 text-brand-grey hover:text-white">
-            {isLoading ? "Generando..." : "Regenerar"}
+            {isLoading ? "Generating..." : "Regenerate"}
           </Button>
           <Button onClick={addScene} variant="outline" size="sm" className="border-brand-grey/20 text-brand-grey hover:text-white">
-            <Plus className="mr-2 h-4 w-4" /> Añadir Fila
+            <Plus className="mr-2 h-4 w-4" /> Add Row
           </Button>
           <Button onClick={handleSave} disabled={isSaving} size="sm" className="bg-brand-red hover:bg-brand-red/90 text-white">
-            {isSaving ? "Guardando..." : <><Save className="mr-2 h-4 w-4" /> Guardar</>}
+            {isSaving ? "Saving..." : <><Save className="mr-2 h-4 w-4" /> Save</>}
           </Button>
         </div>
       </div>
@@ -137,7 +136,7 @@ export default function GenerateStoryboardSection({
           <thead className="text-xs text-white uppercase bg-[#111] border-b border-brand-grey/20">
             <tr>
               <th className="px-4 py-3 w-16">#</th>
-              <th className="px-4 py-3 w-24">Duración</th>
+              <th className="px-4 py-3 w-24">Duration</th>
               <th className="px-4 py-3 min-w-[200px]">Narración</th>
               <th className="px-4 py-3 min-w-[250px]">Sugerencia Visual</th>
               <th className="px-4 py-3 w-32">Tipo Cámara</th>
@@ -151,14 +150,8 @@ export default function GenerateStoryboardSection({
                 <td className="px-4 py-3 font-medium text-white">
                   {scene.sceneNumber || index + 1}
                 </td>
-                <td className="px-4 py-3">
-                  <input 
-                    type="text" 
-                    value={scene.duration || ""} 
-                    onChange={(e) => updateScene(index, "duration", e.target.value)}
-                    className="w-full bg-transparent border border-brand-grey/20 rounded p-1 text-white focus:outline-none focus:border-brand-red text-sm"
-                    placeholder="e.g. 5s"
-                  />
+                <td className="px-4 py-3 text-white">
+                  {scene.durationFromAudio ? scene.duration : "Auto"}
                 </td>
                 <td className="px-4 py-3">
                   <textarea 

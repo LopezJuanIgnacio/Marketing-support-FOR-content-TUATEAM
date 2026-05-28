@@ -17,11 +17,9 @@ const sidebarNavItems = [
     icon: Folder,
   },
   {
-    title: "Upload",
-    href: "/upload",
-    icon: Upload,
-  },
-  {
+    // Upload entry removed per request
+  
+  
     title: "Settings",
     href: "/settings",
     icon: Settings,

@@ -14,6 +14,7 @@ import GenerateScriptSection from "@/components/GenerateScriptSection";
 import GenerateStoryboardSection from "@/components/GenerateStoryboardSection";
 import GenerateAudioSection from "@/components/GenerateAudioSection";
 import GenerateVideoSection from "@/components/GenerateVideoSection";
+import { getPresignedUrl } from "@/lib/s3";
 
 export default async function ProjectDetailsPage({ params }: { params: Promise<{ id: string }> }) {
   const resolvedParams = await params;
@@ -166,7 +167,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
             ) : project.videoProject ? (
               <div className="space-y-4">
                 <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10">
-                  <h4 className="font-medium text-white mb-4">Resumen AI</h4>
+                  <h4 className="font-medium text-white mb-4">AI Summary</h4>
                   <div className="space-y-4">
                     {summaryData?.title && (
                       <div>
@@ -216,7 +217,7 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
                 ) : (
                   <>
                     <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10">
-                      <h4 className="font-medium text-white mb-4">Historia Seleccionada</h4>
+                      <h4 className="font-medium text-white mb-4">Selected Story</h4>
                       <div className="space-y-4">
                         <div>
                           <h5 className="text-xs font-semibold text-brand-grey uppercase">Title</h5>
@@ -251,10 +252,10 @@ export default async function ProjectDetailsPage({ params }: { params: Promise<{
 
                     {storyboardData && (
                       <>
-                        <GenerateAudioSection projectId={project.id} initialAudioUrl={project.videoProject.audioUrl} />
+                        <GenerateAudioSection projectId={project.id} initialAudioUrl={await getPresignedUrl(project.videoProject.audioUrl)} />
                         
                         {project.videoProject.audioUrl && (
-                          <GenerateVideoSection projectId={project.id} initialVideoUrl={project.videoProject.videoUrl} />
+                          <GenerateVideoSection projectId={project.id} initialVideoUrl={await getPresignedUrl(project.videoProject.videoUrl)} />
                         )}
                       </>
                     )}

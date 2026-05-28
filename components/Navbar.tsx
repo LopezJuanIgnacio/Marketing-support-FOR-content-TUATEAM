@@ -24,9 +24,7 @@ export function Navbar() {
                 <Button variant="ghost" asChild>
                   <Link href="/dashboard">Dashboard</Link>
                 </Button>
-                <Button asChild>
-                  <Link href="/upload">Upload PDF</Link>
-                </Button>
+                {/* Upload link removed per design request */}
                 <Button
                   variant="outline"
                   onClick={() => signOut({ callbackUrl: "/" })}

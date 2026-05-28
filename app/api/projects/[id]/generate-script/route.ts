@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { generateScript } from "@/lib/openai/aiEngine";
+import { generateScript, detectLanguage } from "@/lib/openai/aiEngine";
 
 export async function POST(
   request: Request,
@@ -44,8 +44,10 @@ export async function POST(
        return NextResponse.json({ error: "No extracted text available" }, { status: 400 });
     }
 
-    // Call AI Engine using the text and the selected story as context
-    const scriptData = await generateScript(extractedText, project.videoProject.story);
+    const detected = await detectLanguage(extractedText);
+    const language = detected.language || detected.code;
+    // Call AI Engine using the text and the selected story as context, preserving language
+    const scriptData = await generateScript(extractedText, project.videoProject.story, language);
 
     // Clean up potentially empty scenes hallucinated by AI
     if (scriptData.scenes && Array.isArray(scriptData.scenes)) {

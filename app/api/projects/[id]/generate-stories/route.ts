@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { generateStories } from "@/lib/openai/aiEngine";
+import { generateStories, detectLanguage } from "@/lib/openai/aiEngine";
 
 export async function POST(
   request: Request,
@@ -37,8 +37,10 @@ export async function POST(
        return NextResponse.json({ error: "No extracted text available to generate stories" }, { status: 400 });
     }
 
-    // Call AI Engine
-    const storiesData = await generateStories(extractedText);
+    const detected = await detectLanguage(extractedText);
+    const language = detected.language || detected.code;
+    // Call AI Engine with language to keep output in original PDF language
+    const storiesData = await generateStories(extractedText, "", language);
 
     return NextResponse.json({ success: true, stories: storiesData.stories || [] });
   } catch (error) {

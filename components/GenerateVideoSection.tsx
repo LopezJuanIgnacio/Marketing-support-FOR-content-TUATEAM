@@ -44,7 +44,7 @@ export default function GenerateVideoSection({
       <div className="flex items-center justify-between mb-4">
         <h4 className="font-medium text-white flex items-center">
           <Film className="mr-2 h-4 w-4 text-brand-red" />
-          Vídeo Final
+          Final Video
         </h4>
       </div>
 
@@ -52,14 +52,14 @@ export default function GenerateVideoSection({
         {!videoUrl ? (
           <div className="bg-[#111] border border-brand-grey/20 rounded-md p-4">
             <p className="text-sm text-brand-grey mb-4">
-              Genera el archivo de vídeo final combinando los assets visuales (IA), el texto en pantalla y la narración sincronizada.
+              Generate the final video file by combining visual assets (AI), on-screen text, and synchronized narration.
             </p>
             
             <div className="bg-brand-red/10 border border-brand-red/20 rounded-md p-3 mb-4 flex items-start space-x-3">
               <AlertCircle className="w-5 h-5 text-brand-red shrink-0 mt-0.5" />
               <div className="text-xs text-brand-grey leading-relaxed">
-                <strong className="text-white block mb-1">Aviso de tiempo de espera</strong>
-                La renderización de vídeo toma tiempo. Este proceso generará las imágenes con DALL-E, compondrá los clips con FFmpeg y subirá el resultado a S3. Por favor, ten paciencia y no cierres la página.
+                <strong className="text-white block mb-1">Processing Time Notice</strong>
+                Video rendering takes time. This process will generate images with the image API, compose clips with FFmpeg, and upload the result to S3. Please be patient and do not close the page.
               </div>
             </div>
 
@@ -71,19 +71,19 @@ export default function GenerateVideoSection({
               {isLoading ? (
                 <>
                   <div className="w-4 h-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                  Renderizando Vídeo (Esto puede tardar varios minutos)...
+                  Rendering Video (This may take several minutes)...
                 </>
               ) : (
                 <>
                   <PlayCircle className="mr-2 h-4 w-4" />
-                  GENERAR VÍDEO MP4
+                  GENERATE MP4 VIDEO
                 </>
               )}
             </Button>
           </div>
         ) : (
           <div className="bg-[#111] border border-brand-grey/20 rounded-md p-4">
-            <h5 className="text-xs font-semibold text-brand-grey uppercase mb-3">Tu Vídeo Terminado</h5>
+            <h5 className="text-xs font-semibold text-brand-grey uppercase mb-3">Your Finished Video</h5>
             <div className="aspect-video bg-black rounded-md overflow-hidden mb-4 border border-brand-grey/20">
               <video 
                 controls 
@@ -91,14 +91,14 @@ export default function GenerateVideoSection({
                 className="w-full h-full object-contain"
                 poster="/video-placeholder.jpg" // Optional: You could generate a poster frame
               >
-                Tu navegador no soporta la reproducción de vídeos.
+                Your browser does not support video playback.
               </video>
             </div>
             
             <div className="flex gap-2">
               <Button asChild className="flex-1 bg-brand-red hover:bg-brand-red/90 text-white">
                 <a href={videoUrl} target="_blank" rel="noopener noreferrer" download>
-                  Descargar Vídeo
+                  Download Video
                 </a>
               </Button>
               <Button 
@@ -107,7 +107,7 @@ export default function GenerateVideoSection({
                 variant="outline"
                 className="flex-1 border-brand-grey/20 text-brand-grey hover:text-white"
               >
-                {isLoading ? "Regenerando..." : "Regenerar (Costará créditos)"}
+                {isLoading ? "Regenerating..." : "Regenerate (Will cost credits)"}
               </Button>
             </div>
           </div>

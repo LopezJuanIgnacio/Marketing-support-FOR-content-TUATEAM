@@ -3,24 +3,43 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { generateAudio, AudioGenerationOptions } from "@/lib/elevenlabs";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
-import { mkdir, writeFile } from "fs/promises";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { s3Client, getPresignedUrl } from "@/lib/s3";
+import { mkdir, writeFile, unlink } from "fs/promises";
+import ffmpeg from "fluent-ffmpeg";
+import ffmpegInstaller from "@ffmpeg-installer/ffmpeg";
+import ffprobeInstaller from "@ffprobe-installer/ffprobe";
+import os from "os";
 import { join } from "path";
 
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION || "us-east-1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
-    sessionToken: process.env.AWS_SESSION_TOKEN,
-  },
-});
+ffmpeg.setFfmpegPath(ffmpegInstaller.path);
+ffmpeg.setFfprobePath(ffprobeInstaller.path);
 
 async function persistAudioFallback(buffer: Buffer, fileName: string) {
   const publicAudioDir = join(process.cwd(), "public", "generated-audio");
   await mkdir(publicAudioDir, { recursive: true });
   await writeFile(join(publicAudioDir, fileName), buffer);
   return `/generated-audio/${fileName}`;
+}
+
+async function getAudioDurationSeconds(buffer: Buffer, fileName: string): Promise<number> {
+  const tempPath = join(os.tmpdir(), `${Date.now()}-${fileName}`);
+  await writeFile(tempPath, buffer);
+
+  try {
+    return await new Promise<number>((resolve, reject) => {
+      ffmpeg.ffprobe(tempPath, (err, data) => {
+        if (err) {
+          reject(err);
+          return;
+        }
+
+        resolve(data.format?.duration ?? 0);
+      });
+    });
+  } finally {
+    await unlink(tempPath).catch(() => {});
+  }
 }
 
 export async function POST(
@@ -69,6 +88,7 @@ export async function POST(
 
     // Collect all narrations
     const audioBuffers: Buffer[] = [];
+    const sceneDurations: number[] = [];
     
     for (const scene of scenes) {
       const text = scene.narration?.trim();
@@ -76,6 +96,7 @@ export async function POST(
         try {
           const buffer = await generateAudio(text, { voiceType, tone });
           audioBuffers.push(buffer);
+          sceneDurations.push(await getAudioDurationSeconds(buffer, `scene-${scene.sceneNumber || audioBuffers.length}.mp3`));
         } catch (error) {
           console.error(`Error generating audio for scene ${scene.sceneNumber}:`, error);
           // If one fails, we throw an error instead of generating partial audio
@@ -90,6 +111,15 @@ export async function POST(
 
     // Concatenate all audio buffers
     const combinedBuffer = Buffer.concat(audioBuffers);
+
+    const storyboardWithDurations = {
+      ...storyboardData,
+      scenes: scenes.map((scene: any, index: number) => ({
+        ...scene,
+        durationFromAudio: true,
+        duration: `${Math.max(sceneDurations[index] || 0, 0.5).toFixed(2)}s`,
+      })),
+    };
     
     // Upload combined audio to S3
     const fileName = `${Date.now()}-voiceover.mp3`;
@@ -124,10 +154,13 @@ export async function POST(
       where: { projectId: projectId },
       data: {
         audioUrl: audioUrl,
+        storyboard: JSON.stringify(storyboardWithDurations),
       },
     });
 
-    return NextResponse.json({ success: true, audioUrl, videoProject });
+    const presignedAudioUrl = await getPresignedUrl(audioUrl);
+
+    return NextResponse.json({ success: true, audioUrl: presignedAudioUrl, videoProject });
   } catch (error: any) {
     console.error("Error generating/uploading audio:", error);
     return NextResponse.json(

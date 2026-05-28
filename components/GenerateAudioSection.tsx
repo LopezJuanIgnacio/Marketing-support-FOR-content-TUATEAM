@@ -48,41 +48,41 @@ export default function GenerateAudioSection({
   return (
     <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10 mt-4">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-medium text-white flex items-center">
+          <h4 className="font-medium text-white flex items-center">
           <Mic className="mr-2 h-4 w-4 text-brand-red" />
-          Voz en Off (VoiceOver AI)
+          VoiceOver (AI)
         </h4>
       </div>
 
       <div className="space-y-4">
         {!audioUrl ? (
           <div className="bg-[#111] border border-brand-grey/20 rounded-md p-4">
-            <p className="text-sm text-brand-grey mb-4">
-              Genera la narración para todas las escenas de tu storyboard usando voces impulsadas por ElevenLabs.
+              <p className="text-sm text-brand-grey mb-4">
+              Generate narration for all storyboard scenes using ElevenLabs-powered voices.
             </p>
             
             <div className="grid grid-cols-2 gap-4 mb-4">
               <div>
-                <label className="block text-xs font-semibold text-brand-grey uppercase mb-2">Tipo de Voz</label>
+                  <label className="block text-xs font-semibold text-brand-grey uppercase mb-2">Voice Type</label>
                 <select 
                   value={voiceType}
                   onChange={(e) => setVoiceType(e.target.value as "male" | "female")}
                   className="w-full bg-[#0a0a0a] border border-brand-grey/20 rounded-md p-2 text-sm text-white focus:outline-none focus:border-brand-red"
                 >
-                  <option value="male">Masculina</option>
-                  <option value="female">Femenina</option>
+                  <option value="male">Male</option>
+                  <option value="female">Female</option>
                 </select>
               </div>
               
               <div>
-                <label className="block text-xs font-semibold text-brand-grey uppercase mb-2">Tono</label>
+                  <label className="block text-xs font-semibold text-brand-grey uppercase mb-2">Tone</label>
                 <select 
                   value={tone}
                   onChange={(e) => setTone(e.target.value as "professional" | "casual")}
                   className="w-full bg-[#0a0a0a] border border-brand-grey/20 rounded-md p-2 text-sm text-white focus:outline-none focus:border-brand-red"
                 >
-                  <option value="professional">Profesional</option>
-                  <option value="casual">Cercano / Casual</option>
+                  <option value="professional">Professional</option>
+                  <option value="casual">Casual</option>
                 </select>
               </div>
             </div>
@@ -92,33 +92,33 @@ export default function GenerateAudioSection({
               disabled={isLoading}
               className="bg-brand-red hover:bg-brand-red/90 text-white w-full"
             >
-              {isLoading ? (
+                  {isLoading ? (
                 <>
                   <div className="w-4 h-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin" />
-                  Generando Audio...
+                  Generating Audio...
                 </>
               ) : (
                 <>
                   <PlayCircle className="mr-2 h-4 w-4" />
-                  GENERAR AUDIO
+                  GENERATE AUDIO
                 </>
               )}
             </Button>
           </div>
         ) : (
           <div className="bg-[#111] border border-brand-grey/20 rounded-md p-4">
-            <h5 className="text-xs font-semibold text-brand-grey uppercase mb-3">Audio Final</h5>
+            <h5 className="text-xs font-semibold text-brand-grey uppercase mb-3">Final Audio</h5>
             <audio controls src={audioUrl} className="w-full mb-4 outline-none" />
             
             <div className="pt-3 border-t border-brand-grey/20">
-              <Button 
+                <Button 
                 onClick={handleGenerate} 
                 disabled={isLoading}
                 variant="outline"
                 size="sm"
                 className="w-full border-brand-grey/20 text-brand-grey hover:text-white"
               >
-                {isLoading ? "Regenerando..." : "Regenerar Audio (Costará créditos)"}
+                {isLoading ? "Regenerating..." : "Regenerate Audio (Will cost credits)"}
               </Button>
             </div>
           </div>

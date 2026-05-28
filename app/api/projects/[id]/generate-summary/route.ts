@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { generateSummary } from "@/lib/openai/aiEngine";
+import { generateSummary, detectLanguage } from "@/lib/openai/aiEngine";
 
 export async function POST(
   request: Request,
@@ -37,8 +37,10 @@ export async function POST(
        return NextResponse.json({ error: "No extracted text available to generate summary" }, { status: 400 });
     }
 
-    // Call AI Engine
-    const summaryData = await generateSummary(extractedText);
+    // Detect language and call AI Engine to respect original language
+    const detected = await detectLanguage(extractedText);
+    const language = detected.language || detected.code;
+    const summaryData = await generateSummary(extractedText, "", language);
 
     // Store in VideoProject.summary
     const summaryJsonString = JSON.stringify(summaryData);

@@ -49,7 +49,7 @@ export async function generateAudio(text: string, options: AudioGenerationOption
   const apiKey = process.env.ELEVENLABS_API_KEY;
 
   if (!apiKey) {
-    throw new Error("ELEVENLABS_API_KEY no está configurado en el entorno.");
+    throw new Error("ELEVENLABS_API_KEY is not configured in the environment.");
   }
 
   const primaryVoiceId = getConfiguredVoiceId(options);

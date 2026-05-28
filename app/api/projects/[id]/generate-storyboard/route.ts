@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
-import { generateStoryboard } from "@/lib/openai/aiEngine";
+import { generateStoryboard, detectLanguage } from "@/lib/openai/aiEngine";
 
 export async function POST(
   request: Request,
@@ -30,8 +30,10 @@ export async function POST(
       return NextResponse.json({ error: "No script generated yet" }, { status: 400 });
     }
 
-    // Call AI Engine using the script
-    const storyboardData = await generateStoryboard(project.videoProject.script);
+    // Detect language from the script/content and call AI Engine using that language
+    const detected = await detectLanguage(project.videoProject.script || '');
+    const language = detected.language || detected.code;
+    const storyboardData = await generateStoryboard(project.videoProject.script, language);
 
     // Clean up potentially empty scenes hallucinated by AI
     if (storyboardData.scenes && Array.isArray(storyboardData.scenes)) {
@@ -41,6 +43,8 @@ export async function POST(
       // Renumber scenes sequentially
       storyboardData.scenes.forEach((scene: any, i: number) => {
         scene.sceneNumber = i + 1;
+        delete scene.duration;
+        delete scene.durationFromAudio;
       });
     }
 

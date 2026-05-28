@@ -87,21 +87,21 @@ export default function GenerateScriptSection({
   if (!scriptData) {
     return (
       <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10 flex flex-col items-center justify-center space-y-4">
-        <p className="text-sm text-brand-grey text-center">Genera un guion basado en la historia seleccionada y el contenido del PDF.</p>
+        <p className="text-sm text-brand-grey text-center">Generate a script based on the selected story and the PDF content.</p>
         <Button 
           onClick={handleGenerate} 
           disabled={isLoading}
           className="bg-brand-red hover:bg-brand-red/90 text-white w-full max-w-xs"
         >
-          {isLoading ? (
+              {isLoading ? (
             <>
               <div className="w-4 h-4 mr-2 rounded-full border-2 border-white border-t-transparent animate-spin" />
-              Generando...
+              Generating...
             </>
           ) : (
             <>
               <PlayCircle className="mr-2 h-4 w-4" />
-              GUION
+              GENERATE SCRIPT
             </>
           )}
         </Button>
@@ -112,15 +112,15 @@ export default function GenerateScriptSection({
   return (
     <div className="p-4 rounded-md bg-brand-grey/5 border border-brand-grey/10">
       <div className="flex items-center justify-between mb-4">
-        <h4 className="font-medium text-white">Editor de Guion</h4>
+        <h4 className="font-medium text-white">Script Editor</h4>
         <Button onClick={handleSave} disabled={isSaving} size="sm" className="bg-brand-red hover:bg-brand-red/90 text-white">
-          {isSaving ? "Guardando..." : <><Save className="mr-2 h-4 w-4" /> Guardar Guion</>}
+          {isSaving ? "Saving..." : <><Save className="mr-2 h-4 w-4" /> Save Script</>}
         </Button>
       </div>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-xs font-semibold text-brand-grey uppercase mb-1">Título del Video</label>
+          <label className="block text-xs font-semibold text-brand-grey uppercase mb-1">Video Title</label>
           <input 
             type="text" 
             value={scriptData.videoTitle || ""} 
@@ -130,7 +130,7 @@ export default function GenerateScriptSection({
         </div>
 
         <div>
-          <label className="block text-xs font-semibold text-brand-grey uppercase mb-1">Gancho (Hook)</label>
+          <label className="block text-xs font-semibold text-brand-grey uppercase mb-1">Hook</label>
           <textarea 
             value={scriptData.hook || ""} 
             onChange={(e) => setScriptData({ ...scriptData, hook: e.target.value })}
@@ -141,9 +141,9 @@ export default function GenerateScriptSection({
 
         <div>
           <div className="flex items-center justify-between mb-2">
-            <label className="block text-xs font-semibold text-brand-grey uppercase">Escenas</label>
-            <Button onClick={addScene} variant="outline" size="sm" className="h-7 text-xs border-brand-grey/20 text-brand-grey hover:text-white">
-              <Plus className="mr-1 h-3 w-3" /> Añadir Escena
+            <label className="block text-xs font-semibold text-brand-grey uppercase">Scenes</label>
+              <Button onClick={addScene} variant="outline" size="sm" className="h-7 text-xs border-brand-grey/20 text-brand-grey hover:text-white">
+              <Plus className="mr-1 h-3 w-3" /> Add Scene
             </Button>
           </div>
           
@@ -151,15 +151,15 @@ export default function GenerateScriptSection({
             {(scriptData.scenes || []).map((scene: any, index: number) => (
               <div key={index} className="p-3 rounded-md bg-[#111] border border-brand-grey/10 relative">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-xs font-bold text-brand-red">Escena {scene.sceneNumber || index + 1}</span>
-                  <button onClick={() => removeScene(index)} className="text-brand-grey hover:text-brand-red transition-colors" title="Eliminar escena">
+                  <span className="text-xs font-bold text-brand-red">Scene {scene.sceneNumber || index + 1}</span>
+                  <button onClick={() => removeScene(index)} className="text-brand-grey hover:text-brand-red transition-colors" title="Delete scene">
                     <Trash2 className="h-4 w-4" />
                   </button>
                 </div>
                 
                 <div className="space-y-3">
                   <div>
-                    <label className="block text-xs text-brand-grey mb-1">Narración</label>
+                    <label className="block text-xs text-brand-grey mb-1">Narration</label>
                     <textarea 
                       value={scene.narration || ""} 
                       onChange={(e) => updateScene(index, "narration", e.target.value)}
@@ -168,7 +168,7 @@ export default function GenerateScriptSection({
                     />
                   </div>
                   <div>
-                    <label className="block text-xs text-brand-grey mb-1">Texto en Pantalla</label>
+                    <label className="block text-xs text-brand-grey mb-1">Text On Screen</label>
                     <input 
                       type="text" 
                       value={scene.textOnScreen || ""} 

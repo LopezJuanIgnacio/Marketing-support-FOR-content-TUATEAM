@@ -3,22 +3,13 @@ import { getServerSession } from "next-auth/next";
 import { authOptions } from "@/app/api/auth/[...nextauth]/route";
 import { prisma } from "@/lib/prisma";
 import { generateVideo } from "@/lib/video/renderer";
-import { S3Client, PutObjectCommand } from "@aws-sdk/client-s3";
+import { PutObjectCommand } from "@aws-sdk/client-s3";
+import { s3Client, getPresignedUrl } from "@/lib/s3";
 import fs from "fs";
 import path from "path";
 
 // Set max duration for this specific route to 5 minutes on Vercel
 export const maxDuration = 300; 
-
-const s3Client = new S3Client({
-  region: process.env.AWS_REGION || "us-east-1",
-  credentials: {
-    accessKeyId: process.env.AWS_ACCESS_KEY_ID || "",
-    secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY || "",
-    sessionToken: process.env.AWS_SESSION_TOKEN,
-  },
-});
-
 export async function POST(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
@@ -57,7 +48,14 @@ export async function POST(
 
     // Generate video
     console.log("Starting video generation...");
-    const videoFilePath = await generateVideo(storyboardData, project.videoProject.audioUrl);
+    
+    // We must presign the audio URL so the backend can download it
+    const presignedAudioUrlForVideo = await getPresignedUrl(project.videoProject.audioUrl);
+    if (!presignedAudioUrlForVideo) {
+      return NextResponse.json({ error: "Failed to resolve audio URL" }, { status: 400 });
+    }
+
+    const videoFilePath = await generateVideo(storyboardData, presignedAudioUrlForVideo);
     
     // Read the generated video buffer
     const videoBuffer = fs.readFileSync(videoFilePath);
@@ -87,6 +85,12 @@ export async function POST(
       },
     });
 
+    // Mark the project as completed so dashboard counters reflect the rendered video
+    await prisma.project.update({
+      where: { id: projectId },
+      data: { status: "completed" },
+    });
+
     // Cleanup local temp directory
     try {
       const workDir = path.dirname(videoFilePath);
@@ -95,7 +99,9 @@ export async function POST(
       console.error("Error cleaning up temp files:", cleanupError);
     }
 
-    return NextResponse.json({ success: true, videoUrl, videoProject });
+    const presignedVideoUrl = await getPresignedUrl(videoUrl);
+
+    return NextResponse.json({ success: true, videoUrl: presignedVideoUrl, videoProject });
   } catch (error: any) {
     console.error("Error generating/uploading video:", error);
     return NextResponse.json(
